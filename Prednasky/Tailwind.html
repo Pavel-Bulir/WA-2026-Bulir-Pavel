@@ -3,16 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/style.css">
+    <!-- <link rel="stylesheet" href="styles/style.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>WA 2026 - Pavel Bulíř</title>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-myPrimaryColor: #da373d;
+        }
+
+        @layer base {
+            h2 {
+                @apply text-2xl mt-4
+            }
+
+            p {
+                @apply text-base font-serif mt-2
+            }
+
+            .card {
+                @apply bg-teal-300 p-5 rounded-2xl
+            }
+
+            nav li {
+                @apply flex-grow basis-full 
+            }
+
+            nav a {
+                @apply
+                    block
+                    bg-teal-700
+                    text-white
+                    rounded-md
+                    p-1
+                    text-center
+                    no-underline
+                    whitespace-nowrap
+                    hover:bg-teal-800
+            }
+
+        }
+
+        
+    </style>
 </head>
-<body>
-    <div class="page-wrapper">
-        <header>
-            <h1>WA 2026 - první web</h1>
+<body class="bg-teal-500 text-black-100">
+    <div class="page-wrapper w-[95%] mx-auto lg:w-[80%]">
+        <header class="bg-myPrimaryColor p-4">
+            <h1 class="text-3xl">WA 2026 - první web</h1>
         </header>
-        <nav>
-            <ul>
+        <nav class=" my-4">
+            <ul class="flex gap-3 list-none p-0">
                 <li><a href="index.html">Úvod</a></li>
                 <li><a href="#">O nás</a></li>
                 <li><a href="#">Kontakt</a></li>
@@ -20,7 +60,7 @@
             </ul>
         </nav>
         <main>
-            <section class="grid-container">
+            <section class="grid-container grid gap-2 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
                 <article class="card">
                     <h2>Nadpis článku 1</h2>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium eveniet necessitatibus laudantium, voluptate doloribus tenetur quis magni dolore recusandae similique inventore odit eum, voluptas, ad modi. Porro laudantium tempora voluptates.</p>
@@ -56,7 +96,7 @@
 
         
 
-        <footer>
+        <footer class="bg-myPrimaryColor p-4">
             <p>&copy;WA&nbsp;2026 - Pavel Bulíř</p>
         </footer>
     </div>
