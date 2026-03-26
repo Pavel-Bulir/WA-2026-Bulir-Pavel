@@ -10,3 +10,5 @@ error_reporting(E_ALL);
 //Načtení třiídy routeru, která
 require_once '../core/App.php';
 $app = new App();
+
+$router->post('/books/store', 'BookController@store');

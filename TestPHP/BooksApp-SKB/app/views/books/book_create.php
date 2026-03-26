@@ -15,7 +15,10 @@
         </div>
 
         <div>
-            <form action="">
+            <form action="/WA-2026-Bulir-Pavel/TestPHP/BooksApp-SKB/public/index.php?url=book/store" 
+                method="POST" 
+                enctype="multipart/form-data">
+
                 <div>
                     <div>
                         <label for="title">Název knihy<span> *</span></label>
