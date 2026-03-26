@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>Aplikace Knihovna</h1>
+
+        <nav>
+            <ul> <!-- do odkazu href se musí dát reálná absolutní/úplná cesta k souboru index.php -->
+                <li> <a href="/WA-2026-Bulir-Pavel/TestPHP/BooksApp-SKB/public/index.php">Seznam knih (Domů)</a></li>
+                <li> <a href="/WA-2026-Bulir-Pavel/TestPHP/BooksApp-SKB/public/index.php?url=book/create">Přidat novou knihu </a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Dostupné knihy</h2>
+        
+    </main>
+</body>
