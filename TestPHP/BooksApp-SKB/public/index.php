@@ -1,14 +1,20 @@
 <?php
 
-//pro účely cýuky a ladění na lokálmním serveru (např. XAMPP)
-// je vhodné zapnout kompletní zovrazování chyb.
+//pro účely výuky a ladění na lokálním serveru (např. XAMPP)
+// je vhodné zapnout kompletní zobrazování chyb.
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-//Načtení třiídy routeru, která
+// Dynamické zjištění základní adresy aplikace
+// Vypočítá absolutní cestu ke složce, ve které běží tento index.php
+$baseDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+define('BASE_URL', $baseDir);
+echo($baseDir);
+
+//Načtení třídy routeru, která
 require_once '../core/App.php';
 $app = new App();
 
-$router->post('/books/store', 'BookController@store');
+

@@ -15,9 +15,7 @@
         </div>
 
         <div>
-            <form action="/WA-2026-Bulir-Pavel/TestPHP/BooksApp-SKB/public/index.php?url=book/store" 
-                method="POST" 
-                enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>/index.php?url=book/store" method="post" enctype="multipart/form-data">
 
                 <div>
                     <div>
