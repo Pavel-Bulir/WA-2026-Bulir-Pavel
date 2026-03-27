@@ -9,9 +9,10 @@ error_reporting(E_ALL);
 
 // Dynamické zjištění základní adresy aplikace
 // Vypočítá absolutní cestu ke složce, ve které běží tento index.php
-$baseDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$baseDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
 define('BASE_URL', $baseDir);
-echo($baseDir);
+
+
 
 //Načtení třídy routeru, která
 require_once '../core/App.php';

@@ -11,9 +11,8 @@
         <div>
             <h2>Přidat novou knihu</h2>
             <p> Vyplňte údaje a uložte novou knihu do databáze.</p>
-
         </div>
-
+        
         <div>
             <form action="<?= BASE_URL ?>/index.php?url=book/store" method="post" enctype="multipart/form-data">
 
