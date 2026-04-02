@@ -44,13 +44,9 @@
                             <td><?= htmlspecialchars($book['year']) ?></td>
                             <td><?= htmlspecialchars($book['price']) ?> Kč</td>
                             <td>
-<<<<<<< HEAD
                                 <a href="<?= BASE_URL ?>/index.php?url=book/show/<?= $book['id'] ?>">Detail</a> | 
                                 <a href="<?= BASE_URL ?>/index.php?url=book/edit/<?= $book['id'] ?>">Upravit</a> | 
                                 <a href="<?= BASE_URL ?>/index.php?url=book/delete/<?= $book['id'] ?>" onclick="return confirm('Opravdu chcete tuto knihu smazat?')">Smazat</a>
-=======
-                                <a href="<?= BASE_URL ?>/index.php?url=book/show/<?= $book['id'] ?>">Detail</a>
->>>>>>> 0a3a74a70ea99ab089a57893d207a5356d8be572
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -58,4 +54,34 @@
             </table>
         <?php endif; ?>
     </main>
+    <main>
+        
+        <?php if (isset($_SESSION['messages']) && !empty($_SESSION['messages'])): ?>
+            <div class="notifications-container">
+                
+                <?php foreach ($_SESSION['messages'] as $type => $messages): ?>
+                    <?php 
+                        // Jednoduché určení barvy podle typu zprávy
+                        $color = 'black';
+                        if ($type === 'success') $color = 'green';
+                        if ($type === 'error') $color = 'red';
+                        if ($type === 'notice') $color = 'orange';
+                    ?>
+                    
+                    <?php foreach ($messages as $message): ?>
+                        <div style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px;">
+                            <strong><?= htmlspecialchars($message) ?></strong>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+                
+            </div>
+            
+            <?php 
+                // ZÁSADNÍ KROK: Po vypsání musíme zprávy ze session vymazat, 
+                // aby se nezobrazovaly při každém dalším obnovení stránky!
+                unset($_SESSION['messages']); 
+            ?>
+        <?php endif; ?>
+        <h2>Dostupné knihy</h2>
 </body>
