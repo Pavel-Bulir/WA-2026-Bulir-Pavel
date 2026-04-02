@@ -11,8 +11,13 @@ class Book
 
     public function create( string $title, string $author, int $year, string $category, string $subcategory, float $price, $isbn, string $description, string $link, $images):bool
     {
+<<<<<<< HEAD
         $sql = "INSERT INTO books (title, author, category, subcategory, year, price, isbn, description, link, images)
                 VALUES (:title, :author, :category, :subcategory, :year, :price, :isbn, :description, :link, :images)";
+=======
+        $sql = "INSERT INTO books (title, author, category, subcategory, year, price, isbn, description, link, images)"
+                VALUES (:title, :author, :category, :subcategory, :year, :price, :isbn, :description, :link, :images)
+>>>>>>> 0a3a74a70ea99ab089a57893d207a5356d8be572
         //stmt = statement
         $stmt = $this->db->prepare($sql);
 
@@ -39,6 +44,7 @@ class Book
         // Vrací pole asociativních polí (každý řádek z DB je jedno pole)
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+<<<<<<< HEAD
 
         // Získání jedné konkrétní knihy podle jejího ID
     public function getById($id) {
@@ -95,4 +101,6 @@ class Book
         // Vrací true při úspěchu, false při chybě
         return $stmt->execute([':id' => $id]);
     }
+=======
+>>>>>>> 0a3a74a70ea99ab089a57893d207a5356d8be572
 }

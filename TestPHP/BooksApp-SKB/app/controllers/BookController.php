@@ -59,7 +59,12 @@ class BookController {
             // Vytvoření objektu knihy a volání metody pro uložení
             $bookModel = new Book($db);
             $isSaved = $bookModel->create(
+<<<<<<< HEAD
                 $title, $author, $year, $category, $subcategory, $price, $isbn, $description, $link, $uploadedImages
+=======
+                $title, $author, $category, $subcategory, 
+                $year, $price, $isbn, $description, $link, $uploadedImages
+>>>>>>> 0a3a74a70ea99ab089a57893d207a5356d8be572
             );
 
             // 3. Vyhodnocení výsledku a přesměrování
@@ -95,6 +100,7 @@ class BookController {
     protected function addErrorMessage($message) {
         // Zde by byla logika pro uložení červené chybové zprávy (např. do $_SESSION)
     }
+<<<<<<< HEAD
 
         // 4. Smazání existující knihy
     public function delete($id = null) {
@@ -222,5 +228,7 @@ class BookController {
             $this->addNoticeMessage('Pro úpravu knihy je nutné odeslat formulář.');
         }
     }
+=======
+>>>>>>> 0a3a74a70ea99ab089a57893d207a5356d8be572
 }
 
