@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <title>Knihovna</title>
-
-    <style>
-        body {
-            background: #f5f0e6;
-            background-image: url("https://www.transparenttextures.com/patterns/old-wall.png");
-        }
-    </style>
-</head>
+<?php require_once '../app/views/layout/header.php'; ?>
 
 <body class="font-serif text-gray-800">
 
@@ -43,6 +26,15 @@
                       shadow-sm hover:shadow-md hover:bg-[#f3ede4] transition-all duration-200
                       font-medium tracking-wide">
                Přidat novou knihu
+            </a>
+        </li>
+
+        <li>
+            <a href="<?= BASE_URL ?>/index.php?url=book/create"
+               class="px-5 py-2 rounded-md bg-[#e8dfd0] border border-[#c8b8a6] text-[#4a3f35] 
+                      shadow-sm hover:shadow-md hover:bg-[#f3ede4] transition-all duration-200
+                      font-medium tracking-wide">
+               Registrace
             </a>
         </li>
 
@@ -125,5 +117,6 @@
 
 </main>
 
+<?php require_once '../app/views/layout/footer.php'; ?>
 </body>
 </html>
