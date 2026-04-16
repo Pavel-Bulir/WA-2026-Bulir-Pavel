@@ -9,24 +9,37 @@ class Book
         $this->db = $db;
     }
 
-    public function create( string $title, string $author, int $year, string $category, string $subcategory, float $price, $isbn, string $description, string $link, $images):bool
-    {
-        $sql = "INSERT INTO books (title, author, category, subcategory, year, price, isbn, description, link, images)
-                VALUES (:title, :author, :category, :subcategory, :year, :price, :isbn, :description, :link, :images)";
-        //stmt = statement
+        public function create(
+        string $title,
+        string $author,
+        string $category,
+        string $subcategory,
+        int $year,
+        float $price,
+        string $isbn,
+        string $description,
+        string $link,
+        array $images,
+        int $userId // !!! ZMĚNA: NOVÝ PARAMETR PRO ID UŽIVATELE
+    ): bool {
+        // !!! ZMĚNA: Přidali jsme created_by do INSERT i VALUES
+        $sql = "INSERT INTO books (title, author, category, subcategory, year, price, isbn, description, link, images, created_by)
+                VALUES (:title, :author, :category, :subcategory, :year, :price, :isbn, :description, :link, :images, :created_by)";
+        
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
             ':title' => $title,
             ':author' => $author,
-            ':year' => $year,
             ':category' => $category,
             ':subcategory' => $subcategory ?: null,
+            ':year' => $year,
             ':price' => $price,
             ':isbn' => $isbn,
             ':description' => $description,
             ':link' => $link,
             ':images' => json_encode($images),
+            ':created_by' => $userId // !!! ZMĚNA: Předání ID do databáze
         ]);
     }
 

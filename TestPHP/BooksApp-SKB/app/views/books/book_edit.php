@@ -1,6 +1,6 @@
 <?php require_once '../app/views/layout/header.php'; ?>
 
-
+<body class="font-serif text-gray-800">
 
 <div class="max-w-5xl mx-auto px-6 py-10">
 
@@ -33,60 +33,51 @@
     <!-- Formulář -->
     <div class="bg-[#fcfaf7] border border-[#c8b8a6] shadow-xl shadow-[#b89f85]/40 rounded-lg p-8">
 
-        <form action="<?= BASE_URL ?>/index.php?url=book/update/<?= htmlspecialchars($book['id']) ?>"
-              method="post" enctype="multipart/form-data">
+        <form action="<?= BASE_URL ?>/index.php?url=book/update/<?= $book['id'] ?>" method="post">
 
-            <!-- GRID 2 SLOUPCE -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                 <!-- LEVÝ SLOUPEC -->
                 <div class="space-y-6">
 
                     <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">ID v databázi</label>
-                        <input type="text" value="<?= htmlspecialchars($book['id']) ?>" readonly
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-gray-100 text-gray-700">
-                    </div>
-
-                    <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">
-                            Název knihy <span class="text-red-600">*</span>
-                        </label>
+                        <label class="block font-medium text-[#4a3f35] mb-1">Název knihy *</label>
                         <input type="text" name="title" required
                                value="<?= htmlspecialchars($book['title']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">
-                            Autor <span class="text-red-600">*</span>
-                        </label>
+                        <label class="block font-medium text-[#4a3f35] mb-1">Autor *</label>
                         <input type="text" name="author" required
                                value="<?= htmlspecialchars($book['author']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
                         <label class="block font-medium text-[#4a3f35] mb-1">ISBN</label>
-                        <input type="text" name="isbn"
+                        <input type="number" name="isbn"
                                value="<?= htmlspecialchars($book['isbn']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">
-                            Rok vydání <span class="text-red-600">*</span>
-                        </label>
+                        <label class="block font-medium text-[#4a3f35] mb-1">Rok vydání *</label>
                         <input type="number" name="year" required
                                value="<?= htmlspecialchars($book['year']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">Cena knihy</label>
-                        <input type="number" step="0.5" name="price"
+                        <label class="block font-medium text-[#4a3f35] mb-1">Cena</label>
+                        <input type="number" name="price" step="0.5"
                                value="<?= htmlspecialchars($book['price']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                 </div>
@@ -94,37 +85,51 @@
                 <!-- PRAVÝ SLOUPEC -->
                 <div class="space-y-6">
 
+
+
                     <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">Kategorie</label>
-                        <input type="text" name="category"
-                               value="<?= htmlspecialchars($book['category']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
-                    </div>
+    <label for="category" class="block font-medium text-[#4a3f35] mb-1">Kategorie *</label>
+
+    <select id="category" name="category" required
+            class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                   focus:ring-2 focus:ring-[#b89f85]">
+
+        <option value="">-- Vyberte kategorii --</option>
+
+        <?php foreach ($categories as $cat): ?>
+            <?php 
+                $isSelected = ($book['category'] == $cat['id']) ? 'selected' : ''; 
+            ?>
+            <option value="<?= htmlspecialchars($cat['id']) ?>" <?= $isSelected ?>>
+                <?= htmlspecialchars($cat['name']) ?>
+            </option>
+        <?php endforeach; ?>
+
+    </select>
+</div>
+
 
                     <div>
                         <label class="block font-medium text-[#4a3f35] mb-1">Podkategorie</label>
                         <input type="text" name="subcategory"
                                value="<?= htmlspecialchars($book['subcategory']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
                         <label class="block font-medium text-[#4a3f35] mb-1">Odkaz</label>
                         <input type="text" name="link"
                                value="<?= htmlspecialchars($book['link']) ?>"
-                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]">
+                               class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                               focus:ring-2 focus:ring-[#b89f85]">
                     </div>
 
                     <div>
                         <label class="block font-medium text-[#4a3f35] mb-1">Popis knihy</label>
-                        <textarea name="description" rows="5"
-                                  class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white focus:ring-2 focus:ring-[#b89f85]"><?= htmlspecialchars($book['description']) ?></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block font-medium text-[#4a3f35] mb-1">Obrázky (zatím neřešíme)</label>
-                        <input type="file" name="images[]" multiple accept="image/*"
-                               class="w-full p-2 border border-[#d6c7b4] rounded-md bg-white">
+                        <textarea name="description" rows="6"
+                                  class="w-full p-3 border border-[#d6c7b4] rounded-md bg-white text-[#4a3f35]
+                                  focus:ring-2 focus:ring-[#b89f85]"><?= htmlspecialchars($book['description']) ?></textarea>
                     </div>
 
                 </div>
@@ -135,9 +140,9 @@
             <div class="pt-8">
                 <button type="submit"
                         class="px-6 py-3 bg-[#d6bfa5] border border-[#b89f85] rounded-md
-                               text-[#4a3f35] font-semibold shadow-sm hover:shadow-md
-                               hover:bg-[#e2cfba] transition-all duration-200">
-                    Uložit změny do DB
+                        text-[#4a3f35] font-semibold shadow-sm hover:shadow-md
+                        hover:bg-[#e2cfba] transition-all duration-200">
+                    Uložit změny
                 </button>
             </div>
 
@@ -145,36 +150,7 @@
     </div>
 </div>
 
-
-<script>
-    // Najdeme naše HTML prvky podle ID
-    const fileInput = document.getElementById('images');
-    const fileTitle = document.getElementById('file-title');
-    const fileInfo = document.getElementById('file-info');
-
-    // Posloucháme událost 'change' (změna hodnoty v inputu)
-    fileInput.addEventListener('change', function(event) {
-        const files = event.target.files;
-        
-        if (files.length === 0) {
-            // Uživatel výběr zrušil
-            fileTitle.textContent = 'Klikněte pro výběr souborů';
-            fileTitle.className = 'text-sm text-slate-400 font-semibold';
-            fileInfo.textContent = 'Žádné soubory nebyly vybrány';
-        } else if (files.length === 1) {
-            // Vybrán 1 soubor - ukážeme jeho název
-            fileTitle.textContent = 'Soubor připraven';
-            fileTitle.className = 'text-sm text-blue-400 font-bold';
-            fileInfo.textContent = files[0].name;
-        } else {
-            // Vybráno více souborů - ukážeme počet
-            fileTitle.textContent = 'Soubory připraveny';
-            fileTitle.className = 'text-sm text-blue-400 font-bold';
-            fileInfo.textContent = 'Vybráno celkem: ' + files.length + ' souborů';
-        }
-    });
-</script>
-
 <?php require_once '../app/views/layout/footer.php'; ?>
+
 </body>
 </html>
