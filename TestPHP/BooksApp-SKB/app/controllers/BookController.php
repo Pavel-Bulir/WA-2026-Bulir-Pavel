@@ -288,8 +288,8 @@ class BookController {
             $title = htmlspecialchars($_POST['title'] ?? '');
             $author = htmlspecialchars($_POST['author'] ?? '');
             $isbn = htmlspecialchars($_POST['isbn'] ?? '');
-            //$category = htmlspecialchars($_POST['category'] ?? '');
-            $category = (int)($_POST['category'] ?? 0);
+            $category = htmlspecialchars($_POST['category'] ?? '');
+            
             $subcategory = htmlspecialchars($_POST['subcategory'] ?? '');
             
             // Přetypování číselných hodnot
