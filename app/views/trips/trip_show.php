@@ -90,23 +90,27 @@
                 <p class="text-sm font-medium text-green-900 mb-2">Fotografie</p>
                 <div class="grid grid-cols-3 gap-2">
                     <?php foreach ($images as $image): ?>
-                        <img src="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($image) ?>"
+                        <a href="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($image) ?>" target="_blank">
+                            <img src="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($image) ?>"
                              class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
+                        </a>
                     <?php endforeach; ?>
                 </div>
             </div>
             <?php endif; ?>
 
             <div class="flex gap-2 mt-2 border-t border-gray-200 pt-4">
-                <a href="<?= BASE_URL ?>/index.php?url=trip/edit/<?= $trip->id ?>"
-                   class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by): ?>
+                    <a href="<?= BASE_URL ?>/index.php?url=trip/edit/<?= $trip->id ?>"
+                    class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
                     Upravit
-                </a>
-                <a href="<?= BASE_URL ?>/index.php?url=trip/delete/<?= $trip->id ?>"
-                   onclick="return confirm('Opravdu chcete smazat tento výlet?')"
-                   class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
+                    </a>
+                    <a href="<?= BASE_URL ?>/index.php?url=trip/delete/<?= $trip->id ?>"
+                    onclick="return confirm('Opravdu chcete smazat tento výlet?')"
+                    class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
                     Smazat
-                </a>
+                    </a>
+                <?php endif; ?>
             </div>
 
         </div>

@@ -20,11 +20,23 @@ class TripController {
 
     // 1. Zobrazení formuláře pro přidání nového výletu
     public function create() {
+        if (!isset($_SESSION['user_id'])) {
+        $this->addErrorMessage('Pro přidání výletu musíte být přihlášeni.');
+        header('Location: ' . BASE_URL . '/index.php?url=auth/login');
+        exit;
+        }
         require '../app/views/trips/trip_create.php';
     }
 
     // 2. Zpracování dat odeslaných z formuláře
     public function store() {
+
+        if (!isset($_SESSION['user_id'])) {
+        $this->addErrorMessage('Pro přidání výletu musíte být přihlášeni.');
+        header('Location: ' . BASE_URL . '/index.php?url=auth/login');
+        exit;
+        }    
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $name = htmlspecialchars($_POST['name'] ?? '');
@@ -32,13 +44,12 @@ class TripController {
             $route_url = htmlspecialchars($_POST['route_url'] ?? '');
             $attractions = htmlspecialchars($_POST['attractions'] ?? '');
             $notes = htmlspecialchars($_POST['notes'] ?? '');
-            
             $distance = (float)($_POST['distance'] ?? 0);
             $duration = (int)($_POST['duration'] ?? 0);
             $duration_unit = htmlspecialchars($_POST['duration_unit'] ?? 'hod');
             $difficulty_id = (int)($_POST['difficulty_id'] ?? 0);
             $no_dogs = isset($_POST['no_dogs']) ? 1 : 0;
-            
+            $created_by = $_SESSION['user_id'];
             $suitable_for = isset($_POST['suitable_for']) 
                 ? json_encode($_POST['suitable_for']) 
                 : null;
@@ -57,7 +68,7 @@ class TripController {
 
             $isSaved = $tripModel->store(
                 $name, $distance, $duration, $duration_unit, $difficulty_id, $location, 
-                $route_url, $attractions, $suitable_for, $no_dogs, $notes, $images
+                $route_url, $attractions, $suitable_for, $no_dogs, $notes, $images, $created_by
             );
 
             if ($isSaved) {
@@ -87,7 +98,19 @@ class TripController {
         $db = $database->getConnection();
 
         $tripModel = new Trip($db);
-        $isDeleted = $tripModel->delete($id);
+        // Nejdřív načti výlet
+        $rawTrip = $tripModel->getById($id);
+
+        // Kontrola vlastnictví
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $rawTrip['created_by']) {
+            $this->addErrorMessage('Nemáte oprávnění smazat tento výlet.');
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
+        }
+
+$isDeleted = $tripModel->delete($id);  
+
+        
 
         if ($isDeleted) {
             $this->addSuccessMessage('Výlet byl trvale smazán.');
@@ -120,6 +143,13 @@ class TripController {
             $this->addErrorMessage('Výlet nebyl nalezen.');
             header('Location: ' . BASE_URL . '/index.php');
             exit;
+        }
+
+        // Kontrola vlastnictví
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $rawTrip['created_by']) {
+         $this->addErrorMessage('Nemáte oprávnění upravit tento výlet.');
+         header('Location: ' . BASE_URL . '/index.php');
+         exit;
         }
 
         $trip = new TripDTO($rawTrip);

@@ -73,15 +73,17 @@
                                class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
                                 Detail
                             </a>
+                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by): ?>
                             <a href="<?= BASE_URL ?>/index.php?url=trip/edit/<?= $trip->id ?>"
-                               class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
-                                Upravit
+                            class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
+                             Upravit
                             </a>
                             <a href="<?= BASE_URL ?>/index.php?url=trip/delete/<?= $trip->id ?>"
-                               onclick="return confirm('Opravdu chcete smazat tento výlet?')"
-                               class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
-                                Smazat
+                            onclick="return confirm('Opravdu chcete smazat tento výlet?')"
+                            class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
+                            Smazat
                             </a>
+                        <?php endif; ?>
                         </div>
                     </div>
 

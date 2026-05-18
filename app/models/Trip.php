@@ -22,13 +22,14 @@ class Trip {
     ?string $suitable_for,  // vhodné pro – JSON string, může být null
     int $no_dogs,           // zákaz psů – 0 nebo 1
     ?string $notes,         // poznámky – může být null
-    ?string $images         // fotky – JSON string, může být null
+    ?string $images,         // fotky – JSON string, může být null
+    $created_by = null
 ): bool {                   // : bool znamená že metoda vrátí true nebo false
 
     // SQL dotaz pro vložení nového záznamu
     // Používáme :nazev místo přímých hodnot – ochrana proti SQL injection
-    $sql = "INSERT INTO trips (name, distance, duration, duration_unit, difficulty_id, location, route_url, attractions, suitable_for, no_dogs, notes, images)
-            VALUES (:name, :distance, :duration, :duration_unit, :difficulty_id, :location, :route_url, :attractions, :suitable_for, :no_dogs, :notes, :images)";
+    $sql = "INSERT INTO trips (name, distance, duration, duration_unit, difficulty_id, location, route_url, attractions, suitable_for, no_dogs, notes, images, created_by)
+            VALUES (:name, :distance, :duration, :duration_unit, :difficulty_id, :location, :route_url, :attractions, :suitable_for, :no_dogs, :notes, :images, :created_by)";
 
     // Připravíme dotaz – databáze ho zkontroluje ještě před spuštěním
     $stmt = $this->db->prepare($sql);
@@ -47,7 +48,8 @@ class Trip {
         ':suitable_for' => $suitable_for,
         ':no_dogs' => $no_dogs,
         ':notes' => $notes,
-        ':images' => $images
+        ':images' => $images,
+        ':created_by' => $created_by
     ]);
     }
 
