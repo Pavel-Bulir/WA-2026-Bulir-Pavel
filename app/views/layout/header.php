@@ -29,10 +29,10 @@
         </div>
     </div>
     <nav>
-    <ul style="list-style:none; display:flex; gap:12px; margin:0; padding:0; align-items:center;">
+    <ul style="list-style:none; display:flex; gap:8px; margin:0; padding:0; align-items:center;">
         <li>
             <a href="<?= BASE_URL ?>/index.php"
-               style="color:#2d5a27; text-decoration:none; padding:8px 16px; border:1.5px solid #2d5a27; border-radius:6px; font-size:14px;"
+               style="color:#2d5a27; text-decoration:none; padding:8px 16px; border:1.5px solid #2d5a27; border-radius:6px; font-size:14px; white-space:nowrap;"
                onmouseover="this.style.backgroundColor='#2d5a27';this.style.color='#f0f7ee'"
                onmouseout="this.style.backgroundColor='transparent';this.style.color='#2d5a27'">
                 <i class="ti ti-list"></i> Seznam výletů
@@ -42,15 +42,29 @@
         <?php if (isset($_SESSION['user_id'])): ?>
             <li>
                 <a href="<?= BASE_URL ?>/index.php?url=trip/create"
-                   style="color:#f0f7ee; text-decoration:none; padding:8px 16px; background-color:#2d5a27; border:1.5px solid #2d5a27; border-radius:6px; font-size:14px;"
+                   style="color:#f0f7ee; text-decoration:none; padding:8px 16px; background-color:#2d5a27; border:1.5px solid #2d5a27; border-radius:6px; font-size:14px; white-space:nowrap;"
                    onmouseover="this.style.backgroundColor='#1a3d16'"
                    onmouseout="this.style.backgroundColor='#2d5a27'">
                     <i class="ti ti-plus"></i> Přidat nový výlet
                 </a>
             </li>
+
+                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+    <li>
+        <a href="<?= BASE_URL ?>/index.php?url=auth/users"
+           style="color:#2d5a27; text-decoration:none; padding:8px 16px; border:1.5px solid #2d5a27; border-radius:6px; font-size:14px; white-space:nowrap;"
+           onmouseover="this.style.backgroundColor='#2d5a27';this.style.color='#f0f7ee'"
+           onmouseout="this.style.backgroundColor='transparent';this.style.color='#2d5a27'">
+            <i class="ti ti-users"></i> Uživatelé
+        </a>
+    </li>
+<?php endif; ?>
+
             <li style="font-size:14px; color:#2d5a27;">
+            <a href="<?= BASE_URL ?>/index.php?url=auth/profile" style="color:#2d5a27; text-decoration:none;">
                 Ahoj, <strong><?= htmlspecialchars($_SESSION['user_name']) ?></strong>
-            </li>
+            </a>
+
             <li>
                 <a href="<?= BASE_URL ?>/index.php?url=auth/logout"
                    style="color:#c0392b; text-decoration:none; font-size:14px;">

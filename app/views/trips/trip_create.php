@@ -111,10 +111,14 @@
             </label>
         </div>
 
-        <button type="submit"
-                class="bg-green-800 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors w-fit">
-            Uložit výlet
-        </button>
+        <div>
+    <button type="submit"
+            style="background-color:#166534; color:white; padding:8px 24px; border-radius:6px; border:none; cursor:pointer; font-size:14px;"
+            onmouseover="this.style.backgroundColor='#1a3d16'"
+            onmouseout="this.style.backgroundColor='#166534'">
+        Uložit výlet
+    </button>
+        </div>
 
     </form>
 </main>

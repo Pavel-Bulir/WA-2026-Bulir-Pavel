@@ -35,6 +35,7 @@
             <h2 class="text-2xl font-semibold text-green-900"><?= htmlspecialchars($trip->name) ?> <span class="text-sm text-gray-400 font-normal">#<?= $trip->id ?></span></h2>
 
             <div class="flex flex-col gap-2 text-sm text-gray-700">
+                <p><span class="font-medium text-green-900">Vytvořil:</span> <?= htmlspecialchars($trip->author_name) ?></p>
                 <p><span class="font-medium text-green-900">Místo:</span> <?= htmlspecialchars($trip->location) ?></p>
                 <p><span class="font-medium text-green-900">Délka trasy:</span> <?= (int)$trip->distance ?> km</p>
                 <p><span class="font-medium text-green-900">Doba trvání:</span> <?= $trip->duration ?> <?= $trip->duration_unit ?></p>
@@ -84,7 +85,6 @@
             </div>
             <?php endif; ?>
 
-            <!-- Fotogalerie -->
             <?php if (!empty($images)): ?>
             <div>
                 <p class="text-sm font-medium text-green-900 mb-2">Fotografie</p>
@@ -92,7 +92,7 @@
                     <?php foreach ($images as $image): ?>
                         <a href="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($image) ?>" target="_blank">
                             <img src="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($image) ?>"
-                             class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
+                                 class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity">
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -100,21 +100,93 @@
             <?php endif; ?>
 
             <div class="flex gap-2 mt-2 border-t border-gray-200 pt-4">
-                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by): ?>
+                <?php 
+                    $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+                    if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $trip->created_by || $isAdmin)): ?>
                     <a href="<?= BASE_URL ?>/index.php?url=trip/edit/<?= $trip->id ?>"
-                    class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
-                    Upravit
+                       class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
+                        Upravit
                     </a>
                     <a href="<?= BASE_URL ?>/index.php?url=trip/delete/<?= $trip->id ?>"
-                    onclick="return confirm('Opravdu chcete smazat tento výlet?')"
-                    class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
-                    Smazat
+                       onclick="return confirm('Opravdu chcete smazat tento výlet?')"
+                       class="text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 transition-colors">
+                        Smazat
                     </a>
                 <?php endif; ?>
             </div>
 
         </div>
     </div>
+
+    <!-- Komentáře -->
+    <div class="mt-6 bg-white rounded-xl border border-gray-300 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-green-900 mb-4">Komentáře (<?= count($comments) ?>)</h3>
+
+        <div class="flex flex-col gap-4 mb-6">
+            <?php if (empty($comments)): ?>
+                <p class="text-sm text-gray-500 italic">Zatím žádné komentáře.</p>
+            <?php else: ?>
+                <?php foreach ($comments as $comment): ?>
+                    <?php 
+                        $name = !empty($comment['nickname']) ? $comment['nickname'] : $comment['username'];
+                        $initials = strtoupper(substr($name, 0, 2));
+                    ?>
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <div style="width:36px; height:36px; min-width:36px; border-radius:50%; background:#eaf3de; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; color:#3B6D11;">
+                            <?= $initials ?>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:13px; font-weight:500;"><?= htmlspecialchars($name) ?></span>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:12px; color:#9ca3af;"><?= $comment['created_at'] ?></span>
+                                   <?php 
+                            $isCommentAuthor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'];
+                            $isTripOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by;
+                            $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;?>
+                                   <?php if ($isCommentAuthor): ?>
+    <a href="<?= BASE_URL ?>/index.php?url=trip/editComment/<?= $comment['id'] ?>"
+       style="font-size:12px; color:#2d5a27;">Upravit</a>
+<?php endif; ?>
+<?php if ($isCommentAuthor || $isTripOwner || $isAdmin): ?>
+    <a href="<?= BASE_URL ?>/index.php?url=trip/deleteComment/<?= $comment['id'] ?>"
+       onclick="return confirm('Opravdu chcete smazat tento komentář?')"
+       style="font-size:12px; color:#ef4444;">Smazat</a>
+<?php endif; ?>
+                                </div>
+                            </div>
+                            <p style="font-size:14px; color:#4b5563; margin:4px 0 0;"><?= htmlspecialchars($comment['content']) ?></p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <?php 
+                $myName = $_SESSION['user_name'];
+                $myInitials = strtoupper(substr($myName, 0, 2));
+            ?>
+            <div style="border-top:1px solid #e5e7eb; padding-top:1rem; display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:36px; height:36px; min-width:36px; border-radius:50%; background:#eaf3de; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; color:#3B6D11;">
+                    <?= $myInitials ?>
+                </div>
+                <form action="<?= BASE_URL ?>/index.php?url=trip/addComment/<?= $trip->id ?>" method="POST" style="flex:1;">
+                    <textarea name="content" rows="3" required placeholder="Přidat komentář..."
+                        style="width:100%; border:1px solid #d1d5db; border-radius:6px; padding:8px 12px; font-size:14px; resize:none; box-sizing:border-box;"></textarea>
+                    <button type="submit"
+                            style="margin-top:8px; font-size:13px; padding:6px 16px; border-radius:6px; background:#2d5a27; color:white; border:none; cursor:pointer;">
+                        Odeslat
+                    </button>
+                </form>
+            </div>
+        <?php else: ?>
+            <p class="text-sm text-gray-500 border-t border-gray-200 pt-4">
+                <a href="<?= BASE_URL ?>/index.php?url=auth/login" class="text-green-700 hover:underline">Přihlaste se</a> pro přidání komentáře.
+            </p>
+        <?php endif; ?>
+    </div>
+
 </main>
 
 <?php require_once '../app/views/layout/footer.php'; ?>

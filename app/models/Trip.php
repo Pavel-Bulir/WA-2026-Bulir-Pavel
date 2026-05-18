@@ -71,16 +71,16 @@ class Trip {
 
     // Získání jednoho konkrétního výletu podle jeho ID
 public function getById($id) {
-    $sql = "SELECT trips.*, difficulties.name AS difficulty_name 
+    $sql = "SELECT trips.*, difficulties.name AS difficulty_name,
+            COALESCE(users.nickname, users.username) AS author_name
             FROM trips 
-            LEFT JOIN difficulties ON trips.difficulty_id = difficulties.id 
+            LEFT JOIN difficulties ON trips.difficulty_id = difficulties.id
+            LEFT JOIN users ON trips.created_by = users.id
             WHERE trips.id = :id";
             
     $stmt = $this->db->prepare($sql);
     $stmt->execute([':id' => $id]);
     
-    // Používá se fetch() místo fetchAll(), protože očekáváme maximálně jeden výsledek.
-    // Vrátí asociativní pole s daty výletu, nebo false, pokud výlet neexistuje.
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -88,7 +88,7 @@ public function getById($id) {
 public function update(
     $id, $name, $distance, $duration, $duration_unit,
     $difficulty_id, $location, $route_url, $attractions,
-    $suitable_for, $no_dogs, $notes, $images = null
+    $suitable_for, $no_dogs, $notes, $images = null, $updated_by = null
 ) {
     $sql = "UPDATE trips 
             SET name = :name, 
@@ -102,7 +102,8 @@ public function update(
                 suitable_for = :suitable_for,
                 no_dogs = :no_dogs,
                 notes = :notes,
-                images = :images
+                images = :images,
+                updated_by = :updated_by
             WHERE id = :id";
             
     $stmt = $this->db->prepare($sql);
@@ -121,7 +122,8 @@ public function update(
         ':suitable_for' => $suitable_for,
         ':no_dogs' => $no_dogs,
         ':notes' => $notes,
-        ':images' => $images
+        ':images' => $images,
+        ':updated_by' => $updated_by
     ]);
 }
 

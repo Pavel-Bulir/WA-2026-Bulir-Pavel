@@ -3,6 +3,24 @@
 <main class="max-w-2xl mx-auto px-6 mt-10">
     <h2 class="text-3xl font-semibold text-green-900 mb-6">Nová registrace</h2>
 
+     <?php if (isset($_SESSION['messages']) && !empty($_SESSION['messages'])): ?>
+        <div class="mb-6">
+            <?php foreach ($_SESSION['messages'] as $type => $messages): ?>
+                <?php 
+                    if ($type === 'success') $color = 'green';
+                    elseif ($type === 'error') $color = 'red';
+                    else $color = 'orange';
+                ?>
+                <?php foreach ($messages as $message): ?>
+                    <div style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                        <strong><?= htmlspecialchars($message) ?></strong>
+                    </div>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
+        <?php unset($_SESSION['messages']); ?>
+    <?php endif; ?>
+
     <div class="bg-white rounded-xl border border-gray-300 shadow-sm p-6">
         <form action="<?= BASE_URL ?>/index.php?url=auth/storeUser" method="post" class="flex flex-col gap-4">
 
@@ -24,6 +42,8 @@
                 <label for="password" class="text-green-900 font-medium">Heslo *</label>
                 <input type="password" id="password" name="password" required
                     class="border border-gray-900 rounded px-3 py-2 focus:outline-none focus:border-green-600 bg-white">
+                <span id="password-error" style="display:none; color:red; font-size:13px;"></span>
+                <span style="font-size:12px; color:#6b7280;">Min. 8 znaků, alespoň 1 číslo a 1 velké písmeno.</span>
             </div>
 
             <div class="flex flex-col gap-1">
@@ -66,15 +86,52 @@
     </div>
 </main>
 
-<script> //zvýrazní pole, protože se špatně zadalo potvrzení hesla
+<script>
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('password_confirm').value;
-        
+        const passwordError = document.getElementById('password-error');
+        const confirmError = document.getElementById('confirm-error');
+
+        // Reset chyb
+        passwordError.style.display = 'none';
+        confirmError.style.display = 'none';
+        document.getElementById('password').style.borderColor = '';
+        document.getElementById('password_confirm').style.borderColor = '';
+
+        // Kontrola délky
+        if (password.length < 8) {
+            e.preventDefault();
+            document.getElementById('password').style.borderColor = 'red';
+            passwordError.textContent = 'Heslo musí mít alespoň 8 znaků.';
+            passwordError.style.display = 'block';
+            return;
+        }
+
+        // Kontrola čísla
+        if (!/[0-9]/.test(password)) {
+            e.preventDefault();
+            document.getElementById('password').style.borderColor = 'red';
+            passwordError.textContent = 'Heslo musí obsahovat alespoň jedno číslo.';
+            passwordError.style.display = 'block';
+            return;
+        }
+
+        // Kontrola velkého písmene
+        if (!/[A-Z]/.test(password)) {
+            e.preventDefault();
+            document.getElementById('password').style.borderColor = 'red';
+            passwordError.textContent = 'Heslo musí obsahovat alespoň jedno velké písmeno.';
+            passwordError.style.display = 'block';
+            return;
+        }
+
+        // Kontrola shody hesel
         if (password !== confirm) {
-            e.preventDefault(); // zastaví odeslání formuláře
+            e.preventDefault();
             document.getElementById('password_confirm').style.borderColor = 'red';
-            document.getElementById('confirm-error').style.display = 'block';
+            confirmError.style.display = 'block';
+            return;
         }
     });
 </script>

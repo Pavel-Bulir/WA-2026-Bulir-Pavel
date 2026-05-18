@@ -17,6 +17,7 @@ class TripDTO {
     public ?string $images;
     public string $created_at;
     public int $created_by;
+    public string $author_name;
 
     public function __construct(array $data) {
         $this->id = $data['id'];
@@ -35,5 +36,6 @@ class TripDTO {
         $this->images = $data['images'] ?? null;
         $this->created_at = $data['created_at'];
         $this->created_by = $data['created_by'] ?? 0;
+        $this->author_name = $data['author_name'] ?? 'Neznámý';
     }
 }

@@ -19,6 +19,22 @@ class Comment {
         ]);
     }
 
+    public function getById(int $id) {
+    $sql = "SELECT * FROM comments WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':id' => $id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update(int $id, string $content): bool {
+    $sql = "UPDATE comments SET content = :content WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':id' => $id,
+        ':content' => $content
+    ]);
+    }
+
     // Získání všech komentářů k výletu
     public function getByTripId(int $trip_id) {
         $sql = "SELECT comments.*, users.username, users.nickname 

@@ -102,13 +102,22 @@ class TripController {
         $rawTrip = $tripModel->getById($id);
 
         // Kontrola vlastnictví
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $rawTrip['created_by']) {
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_id'] != $rawTrip['created_by'] && !$isAdmin)) {
             $this->addErrorMessage('Nemáte oprávnění smazat tento výlet.');
             header('Location: ' . BASE_URL . '/index.php');
             exit;
         }
 
-$isDeleted = $tripModel->delete($id);  
+        // Smazání obrázků ze složky uploads
+    $oldImages = json_decode($rawTrip['images'] ?? '[]', true);
+    foreach ($oldImages as $oldImage) {
+    $oldPath = __DIR__ . '/../../public/uploads/' . $oldImage;
+    if (file_exists($oldPath)) {
+        unlink($oldPath);
+    }
+    }
+    $isDeleted = $tripModel->delete($id);  
 
         
 
@@ -146,7 +155,8 @@ $isDeleted = $tripModel->delete($id);
         }
 
         // Kontrola vlastnictví
-        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $rawTrip['created_by']) {
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_id'] != $rawTrip['created_by'] && !$isAdmin)) {
          $this->addErrorMessage('Nemáte oprávnění upravit tento výlet.');
          header('Location: ' . BASE_URL . '/index.php');
          exit;
@@ -211,11 +221,12 @@ $isDeleted = $tripModel->delete($id);
     // Žádné nové obrázky – zachováme staré
     $images = $existingTrip['images'];
 }
+            $updated_by = $_SESSION['user_id'] ?? null;
 
             $isUpdated = $tripModel->update(
                 $id, $name, $distance, $duration, $duration_unit,
                 $difficulty_id, $location, $route_url, $attractions,
-                $suitable_for, $no_dogs, $notes, $images
+                $suitable_for, $no_dogs, $notes, $images, $updated_by
             );
 
             if ($isUpdated) {
@@ -233,30 +244,198 @@ $isDeleted = $tripModel->delete($id);
 
     // 6. Zobrazení detailu výletu
     public function show($id = null) {
-        if (!$id) {
-            header('Location: ' . BASE_URL . '/index.php');
+    if (!$id) {
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    require_once '../app/models/Database.php';
+    require_once '../app/models/Trip.php';
+    require_once '../app/models/Comment.php';
+    require_once '../app/dto/TripDTO.php';
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $tripModel = new Trip($db);
+    $rawTrip = $tripModel->getById($id);
+
+    if (!$rawTrip) {
+        $this->addErrorMessage('Výlet nebyl nalezen.');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    $trip = new TripDTO($rawTrip);
+
+    // Načtení komentářů
+    $commentModel = new Comment($db);
+    $comments = $commentModel->getByTripId((int)$id);
+
+    require_once '../app/views/trips/trip_show.php';
+    }
+
+    // 7. Přidání komentáře k výletu
+public function addComment($id = null) {
+    if (!isset($_SESSION['user_id'])) {
+        $this->addErrorMessage('Pro přidání komentáře musíte být přihlášeni.');
+        header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $content = htmlspecialchars($_POST['content'] ?? '');
+
+        if (empty($content)) {
+            $this->addErrorMessage('Komentář nemůže být prázdný.');
+            header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
             exit;
         }
 
         require_once '../app/models/Database.php';
-        require_once '../app/models/Trip.php';
-        require_once '../app/dto/TripDTO.php';
+        require_once '../app/models/Comment.php';
 
         $database = new Database();
         $db = $database->getConnection();
 
-        $tripModel = new Trip($db);
-        $rawTrip = $tripModel->getById($id);
+        $commentModel = new Comment($db);
+        $isSaved = $commentModel->store((int)$id, (int)$_SESSION['user_id'], $content);
 
-        if (!$rawTrip) {
-            $this->addErrorMessage('Výlet nebyl nalezen.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
+        if ($isSaved) {
+            $this->addSuccessMessage('Komentář byl úspěšně přidán.');
+        } else {
+            $this->addErrorMessage('Nastala chyba. Komentář se nepodařilo uložit.');
         }
+    }
 
-        $trip = new TripDTO($rawTrip);
+    header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
+    exit;
+}
 
-        require_once '../app/views/trips/trip_show.php';
+// 8. Smazání komentáře
+public function deleteComment($id = null) {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    require_once '../app/models/Database.php';
+    require_once '../app/models/Comment.php';
+    require_once '../app/models/Trip.php';
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $commentModel = new Comment($db);
+    
+    // Načti komentář
+    $comment = $commentModel->getById((int)$id);
+    
+    if (!$comment) {
+        $this->addErrorMessage('Komentář nebyl nalezen.');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    // Načti výlet ke kterému komentář patří
+    $tripModel = new Trip($db);
+    $trip = $tripModel->getById($comment['trip_id']);
+
+    // Kontrola oprávnění
+    $isAuthor = $_SESSION['user_id'] == $comment['user_id'];
+    $isTripOwner = $trip && $_SESSION['user_id'] == $trip['created_by'];
+    $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+
+    if (!$isAuthor && !$isTripOwner && !$isAdmin) {
+        $this->addErrorMessage('Nemáte oprávnění smazat tento komentář.');
+        header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $comment['trip_id']);
+        exit;
+    }
+
+    $isDeleted = $commentModel->delete((int)$id);
+
+    if ($isDeleted) {
+        $this->addSuccessMessage('Komentář byl smazán.');
+    } else {
+        $this->addErrorMessage('Nastala chyba. Komentář se nepodařilo smazat.');
+    }
+
+    header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $comment['trip_id']);
+    exit;
+    }
+
+    // 9. Zobrazení formuláře pro úpravu komentáře
+public function editComment($id = null) {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    require_once '../app/models/Database.php';
+    require_once '../app/models/Comment.php';
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $commentModel = new Comment($db);
+    $comment = $commentModel->getById((int)$id);
+
+    if (!$comment) {
+        $this->addErrorMessage('Komentář nebyl nalezen.');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    // Jen autor může upravit komentář
+    if ($_SESSION['user_id'] != $comment['user_id']) {
+        $this->addErrorMessage('Nemáte oprávnění upravit tento komentář.');
+        header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $comment['trip_id']);
+        exit;
+    }
+
+    require_once '../app/views/trips/comment_edit.php';
+}
+
+// 10. Zpracování úpravy komentáře
+public function updateComment($id = null) {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    require_once '../app/models/Database.php';
+    require_once '../app/models/Comment.php';
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $commentModel = new Comment($db);
+    $comment = $commentModel->getById((int)$id);
+
+    if (!$comment || $_SESSION['user_id'] != $comment['user_id']) {
+        $this->addErrorMessage('Nemáte oprávnění upravit tento komentář.');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+
+    $content = htmlspecialchars($_POST['content'] ?? '');
+
+    if (empty($content)) {
+        $this->addErrorMessage('Komentář nemůže být prázdný.');
+        header('Location: ' . BASE_URL . '/index.php?url=trip/editComment/' . $id);
+        exit;
+    }
+
+    $isUpdated = $commentModel->update((int)$id, $content);
+
+    if ($isUpdated) {
+        $this->addSuccessMessage('Komentář byl upraven.');
+    } else {
+        $this->addErrorMessage('Nastala chyba. Komentář se nepodařilo upravit.');
+    }
+
+    header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $comment['trip_id']);
+    exit;
     }
 
     // --- Pomocné metody pro systém notifikací ---

@@ -53,4 +53,35 @@ class User {
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Aktualizace profilu uživatele
+public function update(int $id, string $firstName, string $lastName, string $nickname): bool {
+    $sql = "UPDATE users 
+            SET first_name = :first_name,
+                last_name = :last_name,
+                nickname = :nickname
+            WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':id' => $id,
+        ':first_name' => $firstName,
+        ':last_name' => $lastName,
+        ':nickname' => $nickname
+    ]);
+}
+
+    // Získání všech uživatelů
+public function getAll() {
+    $sql = "SELECT id, username, email, first_name, last_name, nickname, is_admin, created_at FROM users ORDER BY id ASC";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Smazání uživatele
+public function delete(int $id): bool {
+    $sql = "DELETE FROM users WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([':id' => $id]);
+}
 }
