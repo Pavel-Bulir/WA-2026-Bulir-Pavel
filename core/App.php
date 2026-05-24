@@ -3,7 +3,7 @@
 class App {
     // Výchozí nastavení, pokud uživatel přijde na hlavní stránku bez parametrů v URL
     protected $controller = 'TripController';
-    protected $method = 'index'; // Výchozí metoda typicky zobrazuje seznam (např. seznam knih)
+    protected $method = 'index'; // Výchozí metoda typicky zobrazuje seznam
     protected $params = [];
 
     public function __construct() {

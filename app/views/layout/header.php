@@ -64,6 +64,10 @@
             <a href="<?= BASE_URL ?>/index.php?url=auth/profile" style="color:#2d5a27; text-decoration:none;">
                 Ahoj, <strong><?= htmlspecialchars($_SESSION['user_name']) ?></strong>
             </a>
+            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                <span style="font-size:11px; background:#2d5a27; color:white; padding:2px 8px; border-radius:10px; margin-left:4px;">Admin</span>
+            <?php endif; ?>
+            </li>
 
             <li>
                 <a href="<?= BASE_URL ?>/index.php?url=auth/logout"

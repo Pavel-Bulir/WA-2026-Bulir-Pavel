@@ -3,7 +3,7 @@
 <main class="max-w-2xl mx-auto px-6 mt-10">
     <h2 class="text-3xl font-semibold text-green-900 mb-6">Nová registrace</h2>
 
-     <?php if (isset($_SESSION['messages']) && !empty($_SESSION['messages'])): ?>
+    <?php if (isset($_SESSION['messages']) && !empty($_SESSION['messages'])): ?>
         <div class="mb-6">
             <?php foreach ($_SESSION['messages'] as $type => $messages): ?>
                 <?php 
@@ -12,8 +12,9 @@
                     else $color = 'orange';
                 ?>
                 <?php foreach ($messages as $message): ?>
-                    <div style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                    <div class="notification" style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px; display:flex; justify-content:space-between; align-items:center;">
                         <strong><?= htmlspecialchars($message) ?></strong>
+                        <span onclick="this.parentElement.remove()" style="cursor:pointer; font-size:18px; margin-left:10px;">&times;</span>
                     </div>
                 <?php endforeach; ?>
             <?php endforeach; ?>
@@ -40,8 +41,17 @@
 
             <div class="flex flex-col gap-1">
                 <label for="password" class="text-green-900 font-medium">Heslo *</label>
-                <input type="password" id="password" name="password" required
-                    class="border border-gray-900 rounded px-3 py-2 focus:outline-none focus:border-green-600 bg-white">
+                <div style="position:relative;">
+                    <input type="password" id="password" name="password" required
+                        class="border border-gray-900 rounded px-3 py-2 focus:outline-none focus:border-green-600 bg-white"
+                        style="width:100%; box-sizing:border-box;">
+                    <span onclick="
+                        const i = document.getElementById('password');
+                        i.type = i.type === 'password' ? 'text' : 'password';
+                        this.classList.toggle('ti-eye');
+                        this.classList.toggle('ti-eye-off');
+                    " class="ti ti-eye" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; color:#6b7280;"></span>
+                </div>
                 <span id="password-error" style="display:none; color:red; font-size:13px;"></span>
                 <span style="font-size:12px; color:#6b7280;">Min. 8 znaků, alespoň 1 číslo a 1 velké písmeno.</span>
             </div>
@@ -49,7 +59,7 @@
             <div class="flex flex-col gap-1">
                 <label for="password_confirm" class="text-green-900 font-medium">Potvrzení hesla *</label>
                 <input type="password" id="password_confirm" name="password_confirm" required
-                  class="border border-gray-900 rounded px-3 py-2 focus:outline-none focus:border-green-600 bg-white">
+                    class="border border-gray-900 rounded px-3 py-2 focus:outline-none focus:border-green-600 bg-white">
                 <span id="confirm-error" style="display:none; color:red; font-size:13px;">Hesla se neshodují</span>
             </div>
 
@@ -93,13 +103,11 @@
         const passwordError = document.getElementById('password-error');
         const confirmError = document.getElementById('confirm-error');
 
-        // Reset chyb
         passwordError.style.display = 'none';
         confirmError.style.display = 'none';
         document.getElementById('password').style.borderColor = '';
         document.getElementById('password_confirm').style.borderColor = '';
 
-        // Kontrola délky
         if (password.length < 8) {
             e.preventDefault();
             document.getElementById('password').style.borderColor = 'red';
@@ -108,7 +116,6 @@
             return;
         }
 
-        // Kontrola čísla
         if (!/[0-9]/.test(password)) {
             e.preventDefault();
             document.getElementById('password').style.borderColor = 'red';
@@ -117,7 +124,6 @@
             return;
         }
 
-        // Kontrola velkého písmene
         if (!/[A-Z]/.test(password)) {
             e.preventDefault();
             document.getElementById('password').style.borderColor = 'red';
@@ -126,7 +132,6 @@
             return;
         }
 
-        // Kontrola shody hesel
         if (password !== confirm) {
             e.preventDefault();
             document.getElementById('password_confirm').style.borderColor = 'red';

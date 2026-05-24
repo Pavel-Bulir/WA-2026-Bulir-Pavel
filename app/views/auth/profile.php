@@ -12,8 +12,9 @@
                     else $color = 'black';
                 ?>
                 <?php foreach ($messages as $message): ?>
-                    <div style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                    <div class="notification" style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px; display:flex; justify-content:space-between; align-items:center;">
                         <strong><?= htmlspecialchars($message) ?></strong>
+                        <span onclick="this.parentElement.remove()" style="cursor:pointer; font-size:18px; margin-left:10px;">&times;</span>
                     </div>
                 <?php endforeach; ?>
             <?php endforeach; ?>

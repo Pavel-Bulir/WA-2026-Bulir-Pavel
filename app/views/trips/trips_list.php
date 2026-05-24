@@ -12,8 +12,9 @@
                     else $color = 'black';
                 ?>
                 <?php foreach ($messages as $message): ?>
-                    <div style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                    <div class="notification" style="color: <?= $color ?>; border: 1px solid <?= $color ?>; padding: 10px; margin-bottom: 10px; border-radius: 6px; display:flex; justify-content:space-between; align-items:center;">
                         <strong><?= htmlspecialchars($message) ?></strong>
+                        <span onclick="this.parentElement.remove()" style="cursor:pointer; font-size:18px; margin-left:10px;">&times;</span>
                     </div>
                 <?php endforeach; ?>
             <?php endforeach; ?>
@@ -29,10 +30,10 @@
         <div class="flex flex-col gap-4">
             <?php foreach ($trips as $trip): ?>
                 <?php 
-                    $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
-                    $isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by;
+                $isAdmin = isset($_SESSION['user_id']) && isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
+                $isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $trip->created_by;
                 ?>
-                <div class="flex overflow-hidden rounded-xl border <?= $isOwner ? 'border-green-500' : 'border-gray-300' ?> bg-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex overflow-hidden rounded-xl border <?= $isOwner ? 'border-green-500' : 'border-gray-300' ?> bg-white shadow-sm hover:shadow-md transition-shadow">
                     
                     <?php 
                         $images = json_decode($trip->images ?? '[]', true);
@@ -41,9 +42,9 @@
                     <?php if ($firstImage): ?>
                         <img src="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($firstImage) ?>" 
                              alt="<?= htmlspecialchars($trip->name) ?>"
-                             class="w-36 min-w-36 object-cover">
+                             class="w-40 min-w-40 object-cover">
                     <?php else: ?>
-                        <div class="w-36 min-w-36 bg-green-700 flex items-center justify-center">
+                        <div class="w-40 min-w-40 bg-green-700 flex items-center justify-center">
                             <svg width="60" height="66" viewBox="0 0 299 329" fill="none">
                                 <path d="M138 105L104 156H172L138 105Z" fill="#818180"/>
                                 <path d="M110 129L76 180H144L110 129Z" fill="#1a3d16"/>
@@ -59,7 +60,7 @@
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-semibold text-green-900">
                                 <?= htmlspecialchars($trip->name) ?>
-                                <span class="text-xs text-gray-700 font-normal">#<?= $trip->id ?></span>
+                                <span class="text-xs text-gray-400 font-normal">#<?= $trip->id ?></span>
                                 <?php if ($isOwner): ?>
                                     <span class="text-xs px-2 py-1 rounded-full bg-green-800 text-white ml-1">Můj výlet</span>
                                 <?php endif; ?>
@@ -72,13 +73,25 @@
                             </span>
                         </div>
 
-                        <div class="flex gap-4 text-sm text-gray-600">
+                        <div class="flex gap-4 text-sm text-gray-500">
                             <span><i class="ti ti-map-pin"></i> <?= htmlspecialchars($trip->location) ?></span>
                             <span><i class="ti ti-route"></i> <?= (int)$trip->distance ?> km</span>
                             <span><i class="ti ti-clock"></i> <?= $trip->duration ?> <?= $trip->duration_unit ?></span>
                         </div>
+                                
+                        <div class="flex items-center gap-1">
+                            <?php 
+                                $avg = $ratings[$trip->id]['average'] ?? 0;
+                                $count = $ratings[$trip->id]['count'] ?? 0;
+                            ?>
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span style="font-size:16px; color:<?= $i <= round($avg) ? '#f59e0b' : '#d1d5db' ?>;">★</span>
+                            <?php endfor; ?>
+                            <span class="text-xs text-gray-500 ml-1"><?= $avg ?> (<?= $count ?>)</span>
+                        </div>
 
-                        <div class="flex gap-2 mt-2">
+
+                        <div class="flex gap-2 mt-auto pt-2 border-t border-gray-100">
                             <a href="<?= BASE_URL ?>/index.php?url=trip/show/<?= $trip->id ?>"
                                class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors">
                                 Detail

@@ -4,19 +4,28 @@ class TripController {
 
     // 0. Výchozí metoda pro zobrazení úvodní stránky včetně seznamu výletů
     public function index() {
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Trip.php';
-        require_once '../app/dto/TripDTO.php';
+    require_once '../app/models/Database.php';
+    require_once '../app/models/Trip.php';
+    require_once '../app/models/Rating.php';
+    require_once '../app/dto/TripDTO.php';
 
-        $database = new Database();
-        $db = $database->getConnection();
+    $database = new Database();
+    $db = $database->getConnection();
 
-        $tripModel = new Trip($db);
-        $rawTrips = $tripModel->getAll();
-        $trips = array_map(fn($row) => new TripDTO($row), $rawTrips);
-        
-        require_once '../app/views/trips/trips_list.php';
+    $tripModel = new Trip($db);
+    $ratingModel = new Rating($db);
+    
+    $rawTrips = $tripModel->getAll();
+    $trips = array_map(fn($row) => new TripDTO($row), $rawTrips);
+    
+    // Načti hodnocení pro každý výlet
+    $ratings = [];
+    foreach ($trips as $trip) {
+        $ratings[$trip->id] = $ratingModel->getAverageByTripId($trip->id);
     }
+    
+    require_once '../app/views/trips/trips_list.php';
+}
 
     // 1. Zobrazení formuláře pro přidání nového výletu
     public function create() {
@@ -181,7 +190,6 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['user_id'] != $rawTrip['created_b
             $route_url = htmlspecialchars($_POST['route_url'] ?? '');
             $attractions = htmlspecialchars($_POST['attractions'] ?? '');
             $notes = htmlspecialchars($_POST['notes'] ?? '');
-
             $distance = (float)($_POST['distance'] ?? 0);
             $duration = (int)($_POST['duration'] ?? 0);
             $duration_unit = htmlspecialchars($_POST['duration_unit'] ?? 'hod');
@@ -271,6 +279,12 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['user_id'] != $rawTrip['created_b
     // Načtení komentářů
     $commentModel = new Comment($db);
     $comments = $commentModel->getByTripId((int)$id);
+
+    // Načtení hodnocení
+    require_once '../app/models/Rating.php';
+    $ratingModel = new Rating($db);
+    $ratingData = $ratingModel->getAverageByTripId((int)$id);
+    $userRating = isset($_SESSION['user_id']) ? $ratingModel->getUserRating((int)$id, (int)$_SESSION['user_id']) : null;
 
     require_once '../app/views/trips/trip_show.php';
     }
@@ -437,6 +451,43 @@ public function updateComment($id = null) {
     header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $comment['trip_id']);
     exit;
     }
+
+    // 11. Hodnocení výletu
+public function rate($id = null) {
+    if (!isset($_SESSION['user_id'])) {
+        $this->addErrorMessage('Pro hodnocení musíte být přihlášeni.');
+        header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $rating = (int)($_POST['rating'] ?? 0);
+
+        if ($rating < 1 || $rating > 5) {
+            $this->addErrorMessage('Hodnocení musí být mezi 1 a 5.');
+            header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
+            exit;
+        }
+
+        require_once '../app/models/Database.php';
+        require_once '../app/models/Rating.php';
+
+        $database = new Database();
+        $db = $database->getConnection();
+
+        $ratingModel = new Rating($db);
+        $isSaved = $ratingModel->store((int)$id, (int)$_SESSION['user_id'], $rating);
+
+        if ($isSaved) {
+            $this->addSuccessMessage('Hodnocení bylo uloženo.');
+        } else {
+            $this->addErrorMessage('Nastala chyba. Hodnocení se nepodařilo uložit.');
+        }
+    }
+
+    header('Location: ' . BASE_URL . '/index.php?url=trip/show/' . $id);
+    exit;
+}
 
     // --- Pomocné metody pro systém notifikací ---
 

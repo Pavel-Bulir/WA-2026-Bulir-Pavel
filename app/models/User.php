@@ -72,7 +72,14 @@ public function update(int $id, string $firstName, string $lastName, string $nic
 
     // Získání všech uživatelů
 public function getAll() {
-    $sql = "SELECT id, username, email, first_name, last_name, nickname, is_admin, created_at FROM users ORDER BY id ASC";
+    $sql = "SELECT users.id, users.username, users.email, users.first_name, 
+            users.last_name, users.nickname, users.is_admin, users.created_at,
+            GROUP_CONCAT(trips.id ORDER BY trips.id ASC SEPARATOR ', ') AS trip_ids,
+            COUNT(trips.id) AS trip_count
+            FROM users
+            LEFT JOIN trips ON trips.created_by = users.id
+            GROUP BY users.id
+            ORDER BY users.id ASC";
     $stmt = $this->db->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
